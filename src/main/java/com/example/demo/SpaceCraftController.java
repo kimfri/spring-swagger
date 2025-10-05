@@ -2,6 +2,9 @@ package com.example.demo;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +38,20 @@ public class SpaceCraftController {
 
   @Tag(name = "spacecrafts")
   @Operation(summary = "Get the spacecraft with the specified id")
+  @ApiResponse(
+      responseCode = "200",
+      content = {
+          @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = SpaceCraft.class)
+          )
+      }
+  )
+  @ApiResponse(
+      responseCode = "404",
+      description = "SpaceCraft not found",
+      content = {@Content()}
+  )
   @GetMapping(path = "/spacecrafts/{id}", produces = "application/json")
   public ResponseEntity<SpaceCraft> getSpaceCraft(
       @Parameter(description = "Id of the specified spacecraft")
@@ -44,21 +61,27 @@ public class SpaceCraftController {
     if (spaceCraft != null) {
       return new ResponseEntity<>(spaceCraft, HttpStatus.OK);
     }
-    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Tag(name = "spacecrafts")
   @Operation(summary = "Add a spacecraft",
-      description = "This will add a spacecraft and give it a new id")
+      description = "This will add a spacecraft and give it a new id"
+  )
   @PostMapping(path = "/spacecrafts", consumes = "application/json", produces = "application/json")
-  public ResponseEntity<SpaceCraft> addSpaceCraft(
-      @RequestBody SpaceCraft spaceCraft
-  ) {
+  public ResponseEntity<SpaceCraft> addSpaceCraft(@RequestBody SpaceCraft spaceCraft) {
     int amountOfSpaceCrafts = spaceCrafts.size();
     SpaceCraft newSpaceCraft = new SpaceCraft(amountOfSpaceCrafts, spaceCraft.name(), spaceCraft.tailId());
-    if (spaceCrafts.add(newSpaceCraft)) {
-      return new ResponseEntity<>(newSpaceCraft, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    spaceCrafts.add(newSpaceCraft);
+    return new ResponseEntity<>(newSpaceCraft, HttpStatus.OK);
+  }
+
+  @ApiResponse(
+      responseCode = "418",
+      description = "If called upon return 418"
+  )
+  @GetMapping("spacecrafts/brewcoffee")
+  public ResponseEntity<String> teaPot() {
+    return new ResponseEntity<>("I'm a teapot", HttpStatus.I_AM_A_TEAPOT);
   }
 }
