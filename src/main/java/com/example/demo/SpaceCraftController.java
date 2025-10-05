@@ -48,6 +48,8 @@ public class SpaceCraftController {
   }
 
   @Tag(name = "spacecrafts")
+  @Operation(summary = "Add a spacecraft",
+      description = "This will add a spacecraft and give it a new id")
   @PostMapping(path = "/spacecrafts", consumes = "application/json", produces = "application/json")
   public ResponseEntity<SpaceCraft> addSpaceCraft(
       @RequestBody SpaceCraft spaceCraft
